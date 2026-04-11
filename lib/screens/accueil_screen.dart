@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/theme.dart';
-import '../providers/modules_provider.dart';
+import '../providers/app_state.dart';
+import '../utils/format.dart';
+import '../widgets/info_card.dart';
+import '../widgets/stat_card.dart';
 
-/// Écran d'accueil — dashboard des modules, style pastel.
+/// Écran d'accueil — tableau de bord global.
 class AccueilScreen extends StatelessWidget {
   const AccueilScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ModulesProvider>();
-    final unlockedCount =
-        FarmModule.values.where(provider.isUnlocked).length;
-    final total = FarmModule.values.length;
-    final progress = total == 0 ? 0.0 : unlockedCount / total;
+    final state = context.watch<AppState>();
 
     return SafeArea(
       child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Greeting
             const Padding(
               padding: EdgeInsets.fromLTRB(20, 16, 20, 4),
               child: Text(
@@ -46,14 +46,14 @@ class AccueilScreen extends StatelessWidget {
               ),
             ),
 
-            // Carte résumé modules
+            // Carte hero : bilan
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
                   color: AppTheme.accentSoft,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(22),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,48 +67,43 @@ class AccueilScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
-                            Icons.agriculture,
+                            Icons.account_balance_wallet,
                             color: AppTheme.accentDark,
-                            size: 26,
+                            size: 24,
                           ),
                         ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '$unlockedCount / $total modules actifs',
-                                style: const TextStyle(
-                                  color: AppTheme.accentDark,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              const Text(
-                                'Débloquez plus de fonctionnalités',
-                                style: TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Bilan global',
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 8,
-                        backgroundColor: Colors.white,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppTheme.accentDark,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        Fmt.fcfa(state.bilanFcfa),
+                        style: TextStyle(
+                          color: state.bilanFcfa >= 0
+                              ? AppTheme.accentDark
+                              : AppTheme.error,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
                         ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${Fmt.fcfa(state.totalRevenuFcfa)} entrées • ${Fmt.fcfa(state.totalDepenseFcfa)} sorties',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -119,7 +114,7 @@ class AccueilScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.fromLTRB(20, 26, 20, 12),
               child: Text(
-                'Modules',
+                'Aperçu',
                 style: TextStyle(
                   color: AppTheme.text,
                   fontSize: 18,
@@ -128,115 +123,133 @@ class AccueilScreen extends StatelessWidget {
               ),
             ),
 
+            // Grille 2x3 de stats
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  for (final module in FarmModule.values) ...[
-                    _ModuleTile(
-                      module: module,
-                      unlocked: provider.isUnlocked(module),
-                      label: provider.labelOf(module),
-                      price: provider.priceOf(module),
-                    ),
-                    const SizedBox(height: 10),
-                  ],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          icon: Icons.eco,
+                          iconColor: AppTheme.accent,
+                          iconBg: AppTheme.accentSoft,
+                          value: '${state.cultures.length}',
+                          label: 'Cultures',
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          icon: Icons.water_drop,
+                          iconColor: AppTheme.secondary,
+                          iconBg: AppTheme.secondarySoft,
+                          value: '${state.irrigations.length}',
+                          label: 'Arrosages',
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          icon: Icons.inventory_2,
+                          iconColor: AppTheme.warning,
+                          iconBg: AppTheme.warningSoft,
+                          value: '${state.intrants.length}',
+                          label: 'Intrants',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          icon: Icons.shopping_basket,
+                          iconColor: AppTheme.success,
+                          iconBg: AppTheme.successSoft,
+                          value: '${state.recoltes.length}',
+                          label: 'Récoltes',
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          icon: Icons.shopping_cart,
+                          iconColor: AppTheme.accent,
+                          iconBg: AppTheme.accentSoft,
+                          value: '${state.ventes.length}',
+                          label: 'Ventes',
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          icon: Icons.receipt_long,
+                          iconColor: AppTheme.secondary,
+                          iconBg: AppTheme.secondarySoft,
+                          value: '${state.compta.length}',
+                          label: 'Comptes',
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+
+            // Alerte intrants
+            if (state.intrantsEnAlerte > 0) ...[
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: InfoCard(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.warningSoft,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.warning_amber_rounded,
+                          color: AppTheme.warning,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${state.intrantsEnAlerte} intrant${state.intrantsEnAlerte > 1 ? "s" : ""} en alerte stock',
+                              style: const TextStyle(
+                                color: AppTheme.text,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Vérifie tes stocks dans l\'onglet Intrants',
+                              style: TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ModuleTile extends StatelessWidget {
-  final FarmModule module;
-  final bool unlocked;
-  final String label;
-  final String price;
-
-  const _ModuleTile({
-    required this.module,
-    required this.unlocked,
-    required this.label,
-    required this.price,
-  });
-
-  IconData get _icon {
-    switch (module) {
-      case FarmModule.irrigation:
-        return Icons.water_drop_outlined;
-      case FarmModule.cultures:
-        return Icons.eco_outlined;
-      case FarmModule.intrants:
-        return Icons.science_outlined;
-      case FarmModule.recoltes:
-        return Icons.shopping_basket_outlined;
-      case FarmModule.ventes:
-        return Icons.shopping_cart_outlined;
-      case FarmModule.comptabilite:
-        return Icons.calculate_outlined;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: AppTheme.softShadow,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: unlocked ? AppTheme.successSoft : AppTheme.accentSoft,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              _icon,
-              color: unlocked ? AppTheme.success : AppTheme.accentDark,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: AppTheme.text,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  unlocked ? 'Débloqué' : price,
-                  style: TextStyle(
-                    color:
-                        unlocked ? AppTheme.success : AppTheme.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            unlocked ? Icons.check_circle : Icons.lock_outline,
-            color: unlocked ? AppTheme.success : AppTheme.textSecondary,
-            size: 20,
-          ),
-        ],
       ),
     );
   }

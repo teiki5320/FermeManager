@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'constants/theme.dart';
-import 'providers/modules_provider.dart';
+import 'providers/app_state.dart';
 import 'screens/root_tabs.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('fr_FR', null);
   runApp(const FermeManagerApp());
 }
 
@@ -15,7 +18,7 @@ class FermeManagerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ModulesProvider()..load(),
+      create: (_) => AppState()..load(),
       child: MaterialApp(
         title: 'FermeManager',
         debugShowCheckedModeBanner: false,
