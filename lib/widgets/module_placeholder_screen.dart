@@ -5,9 +5,7 @@ import '../constants/theme.dart';
 import '../providers/modules_provider.dart';
 import 'module_verrouille.dart';
 
-/// Écran placeholder pour les modules encore à développer.
-/// Affiche un titre, un sous-titre, une icône, et verrouille le contenu
-/// si le module n'est pas débloqué.
+/// Écran placeholder pour les modules encore à développer — style pastel.
 class ModulePlaceholderScreen extends StatelessWidget {
   final FarmModule module;
   final String title;
@@ -60,12 +58,13 @@ class _Content extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 28,
+                fontSize: 30,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.accent,
+                color: AppTheme.text,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               subtitle,
               style: const TextStyle(
@@ -80,31 +79,36 @@ class _Content extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(28),
                       decoration: BoxDecoration(
-                        color: AppTheme.card,
+                        color: AppTheme.accentSoft,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(icon, size: 72, color: AppTheme.accent),
+                      child: Icon(
+                        icon,
+                        size: 68,
+                        color: AppTheme.accentDark,
+                      ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
                     const Text(
                       'Écran à développer',
                       style: TextStyle(
                         color: AppTheme.text,
                         fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 32),
+                      padding: EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
                         'Le contenu de ce module sera implémenté prochainement.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: AppTheme.textSecondary,
                           fontSize: 14,
+                          height: 1.4,
                         ),
                       ),
                     ),

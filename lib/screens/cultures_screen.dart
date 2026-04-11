@@ -5,7 +5,7 @@ import '../constants/theme.dart';
 import '../providers/modules_provider.dart';
 import '../widgets/module_verrouille.dart';
 
-/// Écran "Cultures" — port fidèle de app/(tabs)/cultures.tsx.
+/// Écran "Cultures" — style pastel.
 class CulturesScreen extends StatelessWidget {
   const CulturesScreen({super.key});
 
@@ -34,6 +34,7 @@ class _Culture {
   final String dateRecolte;
   final String etatSanitaire;
   final Color etatColor;
+  final Color etatBgColor;
 
   const _Culture({
     required this.parcelle,
@@ -44,6 +45,7 @@ class _Culture {
     required this.dateRecolte,
     required this.etatSanitaire,
     required this.etatColor,
+    required this.etatBgColor,
   });
 }
 
@@ -57,6 +59,7 @@ const List<_Culture> _cultures = [
     dateRecolte: '15/05/2026',
     etatSanitaire: 'Bon',
     etatColor: AppTheme.success,
+    etatBgColor: AppTheme.successSoft,
   ),
   _Culture(
     parcelle: 'Parcelle B',
@@ -67,6 +70,7 @@ const List<_Culture> _cultures = [
     dateRecolte: '01/06/2026',
     etatSanitaire: 'Bon',
     etatColor: AppTheme.success,
+    etatBgColor: AppTheme.successSoft,
   ),
   _Culture(
     parcelle: 'Parcelle C',
@@ -77,6 +81,7 @@ const List<_Culture> _cultures = [
     dateRecolte: '20/05/2026',
     etatSanitaire: 'Attention',
     etatColor: AppTheme.warning,
+    etatBgColor: AppTheme.warningSoft,
   ),
   _Culture(
     parcelle: 'Parcelle D',
@@ -87,6 +92,7 @@ const List<_Culture> _cultures = [
     dateRecolte: '25/04/2026',
     etatSanitaire: 'Bon',
     etatColor: AppTheme.success,
+    etatBgColor: AppTheme.successSoft,
   ),
 ];
 
@@ -107,21 +113,22 @@ class _CulturesContent extends StatelessWidget {
           children: [
             // Header
             const Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 16),
+              padding: EdgeInsets.fromLTRB(20, 12, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Cultures',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 30,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.accent,
+                      color: AppTheme.text,
+                      letterSpacing: -0.5,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  SizedBox(height: 4),
                   Text(
-                    'Suivi semis et croissance',
+                    'Suivi des semis et de la croissance',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppTheme.textSecondary,
@@ -140,7 +147,9 @@ class _CulturesContent extends StatelessWidget {
                     child: _SummaryCard(
                       value: '${_cultures.length}',
                       label: 'Cultures',
-                      labelColor: AppTheme.textSecondary,
+                      color: AppTheme.accent,
+                      bgColor: AppTheme.accentSoft,
+                      icon: Icons.eco,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -148,7 +157,9 @@ class _CulturesContent extends StatelessWidget {
                     child: _SummaryCard(
                       value: '$bonCount',
                       label: 'En bonne santé',
-                      labelColor: AppTheme.success,
+                      color: AppTheme.success,
+                      bgColor: AppTheme.successSoft,
+                      icon: Icons.check_circle,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -156,7 +167,9 @@ class _CulturesContent extends StatelessWidget {
                     child: _SummaryCard(
                       value: '$attentionCount',
                       label: 'Attention',
-                      labelColor: AppTheme.warning,
+                      color: AppTheme.warning,
+                      bgColor: AppTheme.warningSoft,
+                      icon: Icons.warning_amber_rounded,
                     ),
                   ),
                 ],
@@ -189,12 +202,16 @@ class _CulturesContent extends StatelessWidget {
 class _SummaryCard extends StatelessWidget {
   final String value;
   final String label;
-  final Color labelColor;
+  final Color color;
+  final Color bgColor;
+  final IconData icon;
 
   const _SummaryCard({
     required this.value,
     required this.label,
-    required this.labelColor,
+    required this.color,
+    required this.bgColor,
+    required this.icon,
   });
 
   @override
@@ -203,23 +220,37 @@ class _SummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppTheme.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(
         children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 18, color: color),
+          ),
+          const SizedBox(height: 10),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
               color: AppTheme.text,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11, color: labelColor),
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -235,10 +266,11 @@ class _CultureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppTheme.card,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,54 +280,71 @@ class _CultureCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Text(
-                    culture.culture,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.text,
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentSoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.eco,
+                      color: AppTheme.accentDark,
+                      size: 20,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    culture.parcelle,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.textSecondary,
-                    ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        culture.culture,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.text,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        culture.parcelle,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppTheme.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  // ignore: deprecated_member_use
-                  color: culture.etatColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
+                  color: culture.etatBgColor,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   culture.etatSanitaire,
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
                     color: culture.etatColor,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           // Progression
           Row(
             children: [
               Expanded(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(6),
                   child: LinearProgressIndicator(
                     value: culture.progression / 100,
                     minHeight: 8,
@@ -306,22 +355,22 @@ class _CultureCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               SizedBox(
-                width: 40,
+                width: 42,
                 child: Text(
                   '${culture.progression}%',
                   textAlign: TextAlign.right,
                   style: const TextStyle(
-                    color: AppTheme.accent,
+                    color: AppTheme.accentDark,
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // Détails
           _DetailRow(
@@ -331,13 +380,13 @@ class _CultureCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           _DetailRow(
-            icon: Icons.eco_outlined,
+            icon: Icons.spa_outlined,
             label: 'Stade',
             value: culture.stade,
           ),
           const SizedBox(height: 6),
           _DetailRow(
-            icon: Icons.check_circle_outline,
+            icon: Icons.event_available_outlined,
             label: 'Récolte prévue',
             value: culture.dateRecolte,
           ),
@@ -362,15 +411,16 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: AppTheme.textSecondary),
+        Icon(icon, size: 15, color: AppTheme.textSecondary),
         const SizedBox(width: 8),
         SizedBox(
-          width: 100,
+          width: 110,
           child: Text(
             label,
             style: const TextStyle(
               color: AppTheme.textSecondary,
               fontSize: 13,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -380,7 +430,7 @@ class _DetailRow extends StatelessWidget {
             style: const TextStyle(
               color: AppTheme.text,
               fontSize: 13,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../constants/theme.dart';
 import '../providers/modules_provider.dart';
 
-/// Écran d'accueil — liste des modules disponibles avec leur statut.
+/// Écran d'accueil — dashboard des modules, style pastel.
 class AccueilScreen extends StatelessWidget {
   const AccueilScreen({super.key});
 
@@ -13,82 +13,102 @@ class AccueilScreen extends StatelessWidget {
     final provider = context.watch<ModulesProvider>();
     final unlockedCount =
         FarmModule.values.where(provider.isUnlocked).length;
+    final total = FarmModule.values.length;
+    final progress = total == 0 ? 0.0 : unlockedCount / total;
 
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             const Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'FermeManager',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.accent,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Gérez votre exploitation facilement',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 4),
+              child: Text(
+                'Bonjour 👋',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Text(
+                'FermeManager',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.text,
+                  letterSpacing: -0.5,
+                ),
               ),
             ),
 
+            // Carte résumé modules
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppTheme.card,
-                  borderRadius: BorderRadius.circular(14),
+                  color: AppTheme.accentSoft,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        // ignore: deprecated_member_use
-                        color: AppTheme.accent.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.agriculture,
-                        color: AppTheme.accent,
-                        size: 28,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.agriculture,
+                            color: AppTheme.accentDark,
+                            size: 26,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$unlockedCount / $total modules actifs',
+                                style: const TextStyle(
+                                  color: AppTheme.accentDark,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              const Text(
+                                'Débloquez plus de fonctionnalités',
+                                style: TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$unlockedCount / ${FarmModule.values.length} modules actifs',
-                            style: const TextStyle(
-                              color: AppTheme.text,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          const Text(
-                            'Débloquez davantage de fonctionnalités',
-                            style: TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 14),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 8,
+                        backgroundColor: Colors.white,
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppTheme.accentDark,
+                        ),
                       ),
                     ),
                   ],
@@ -96,14 +116,14 @@ class AccueilScreen extends StatelessWidget {
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-              child: const Text(
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 26, 20, 12),
+              child: Text(
                 'Modules',
                 style: TextStyle(
                   color: AppTheme.text,
                   fontSize: 18,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
@@ -148,38 +168,44 @@ class _ModuleTile extends StatelessWidget {
   IconData get _icon {
     switch (module) {
       case FarmModule.irrigation:
-        return Icons.water_drop;
+        return Icons.water_drop_outlined;
       case FarmModule.cultures:
-        return Icons.eco;
+        return Icons.eco_outlined;
       case FarmModule.intrants:
-        return Icons.science;
+        return Icons.science_outlined;
       case FarmModule.recoltes:
-        return Icons.shopping_basket;
+        return Icons.shopping_basket_outlined;
       case FarmModule.ventes:
-        return Icons.shopping_cart;
+        return Icons.shopping_cart_outlined;
       case FarmModule.comptabilite:
-        return Icons.calculate;
+        return Icons.calculate_outlined;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          // ignore: deprecated_member_use
-          color: unlocked
-              ? AppTheme.success.withOpacity(0.4)
-              : AppTheme.border,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Row(
         children: [
-          Icon(_icon, color: AppTheme.accent, size: 24),
-          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: unlocked ? AppTheme.successSoft : AppTheme.accentSoft,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              _icon,
+              color: unlocked ? AppTheme.success : AppTheme.accentDark,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,16 +215,15 @@ class _ModuleTile extends StatelessWidget {
                   style: const TextStyle(
                     color: AppTheme.text,
                     fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   unlocked ? 'Débloqué' : price,
                   style: TextStyle(
-                    color: unlocked
-                        ? AppTheme.success
-                        : AppTheme.textSecondary,
+                    color:
+                        unlocked ? AppTheme.success : AppTheme.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
