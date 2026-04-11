@@ -6,9 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../constants/theme.dart';
 import '../providers/modules_provider.dart';
 
-/// Équivalent Flutter du composant `ModuleVerrouille` React Native.
-/// Affiche un bandeau "Mode démo", le contenu démo semi-transparent,
-/// puis une zone d'action (commander via WhatsApp / saisir un code).
+/// Wrap un écran en mode démo : bandeau pastel + contenu atténué + zone de déblocage.
 class ModuleVerrouille extends StatefulWidget {
   final String moduleName;
   final String prix;
@@ -68,6 +66,9 @@ class _ModuleVerrouilleState extends State<ModuleVerrouille> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: Text(title, style: const TextStyle(color: AppTheme.text)),
         content: Text(message, style: const TextStyle(color: AppTheme.text)),
         actions: [
@@ -87,25 +88,40 @@ class _ModuleVerrouilleState extends State<ModuleVerrouille> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Bandeau doré "Mode démo"
+        // Bandeau pastel "Mode démo"
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          color: AppTheme.accent,
-          child: Text(
-            'Mode démo — Débloquer pour ${widget.prix}',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF0A1628),
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+          decoration: const BoxDecoration(
+            color: AppTheme.secondarySoft,
+            border: Border(
+              bottom: BorderSide(color: AppTheme.border),
             ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.lock_outline,
+                size: 16,
+                color: AppTheme.secondary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Mode démo — Débloquer pour ${widget.prix}',
+                style: const TextStyle(
+                  color: AppTheme.secondary,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
         ),
         // Contenu démo semi-transparent, non-interactif
         Expanded(
           child: Opacity(
-            opacity: 0.7,
+            opacity: 0.5,
             child: IgnorePointer(child: widget.child),
           ),
         ),
@@ -133,23 +149,24 @@ class _ModuleVerrouilleState extends State<ModuleVerrouille> {
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: _handleWhatsApp,
-            icon: const Icon(Icons.chat_bubble, color: Colors.white),
+            icon: const Icon(Icons.chat_bubble_outline),
             label: const Text('Commander via WhatsApp'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF25D366),
+              backgroundColor: const Color(0xFF75C796),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               textStyle: const TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
+              elevation: 0,
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -160,14 +177,15 @@ class _ModuleVerrouilleState extends State<ModuleVerrouille> {
               style: TextStyle(color: AppTheme.accent),
             ),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppTheme.accent),
+              backgroundColor: AppTheme.accentSoft,
+              side: BorderSide.none,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               textStyle: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -182,11 +200,11 @@ class _ModuleVerrouilleState extends State<ModuleVerrouille> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text(
-          'Entrez votre code de déblocage :',
+          'Entrez votre code de déblocage',
           style: TextStyle(
             color: AppTheme.text,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 12),
@@ -205,27 +223,31 @@ class _ModuleVerrouilleState extends State<ModuleVerrouille> {
                   color: AppTheme.text,
                   fontSize: 18,
                   letterSpacing: 4,
+                  fontWeight: FontWeight.w700,
                 ),
                 decoration: InputDecoration(
                   counterText: '',
-                  hintText: 'Code à 8 chiffres',
-                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                  hintText: '• • • • • • • •',
+                  hintStyle: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    letterSpacing: 4,
+                  ),
                   filled: true,
-                  fillColor: AppTheme.card,
+                  fillColor: AppTheme.background,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12,
+                    vertical: 14,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppTheme.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppTheme.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppTheme.accent),
                   ),
                 ),
@@ -236,29 +258,34 @@ class _ModuleVerrouilleState extends State<ModuleVerrouille> {
               onPressed: _handleUnlock,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.accent,
-                foregroundColor: const Color(0xFF0A1628),
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
+                  horizontal: 22,
+                  vertical: 16,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 textStyle: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
+                elevation: 0,
               ),
               child: const Text('Valider'),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         TextButton(
           onPressed: () => setState(() => _showUnlock = false),
           child: const Text(
             'Annuler',
-            style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

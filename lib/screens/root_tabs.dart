@@ -34,17 +34,46 @@ class _RootTabsState extends State<RootTabs> {
   ];
 
   static const _items = <BottomNavigationBarItem>[
-    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
-    BottomNavigationBarItem(icon: Icon(Icons.water_drop), label: 'Irrigation'),
-    BottomNavigationBarItem(icon: Icon(Icons.eco), label: 'Cultures'),
-    BottomNavigationBarItem(icon: Icon(Icons.science), label: 'Intrants'),
     BottomNavigationBarItem(
-      icon: Icon(Icons.shopping_basket),
+      icon: Icon(Icons.home_outlined),
+      activeIcon: Icon(Icons.home),
+      label: 'Accueil',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.water_drop_outlined),
+      activeIcon: Icon(Icons.water_drop),
+      label: 'Irrigation',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.eco_outlined),
+      activeIcon: Icon(Icons.eco),
+      label: 'Cultures',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.science_outlined),
+      activeIcon: Icon(Icons.science),
+      label: 'Intrants',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.shopping_basket_outlined),
+      activeIcon: Icon(Icons.shopping_basket),
       label: 'Récoltes',
     ),
-    BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Ventes'),
-    BottomNavigationBarItem(icon: Icon(Icons.calculate), label: 'Comptes'),
-    BottomNavigationBarItem(icon: Icon(Icons.cloud_download), label: 'MAJ'),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.shopping_cart_outlined),
+      activeIcon: Icon(Icons.shopping_cart),
+      label: 'Ventes',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.calculate_outlined),
+      activeIcon: Icon(Icons.calculate),
+      label: 'Comptes',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.cloud_download_outlined),
+      activeIcon: Icon(Icons.cloud_download),
+      label: 'MAJ',
+    ),
   ];
 
   @override

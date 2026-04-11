@@ -1,35 +1,73 @@
 import 'package:flutter/material.dart';
 
-/// Palette et thème global de FermeManager.
-/// Équivalent Flutter de l'ancien `constants/theme.ts` Expo.
+/// Palette pastel et thème global de FermeManager.
+/// Identité : sage green (agriculture) + crème + accents doux.
 class AppTheme {
-  // Couleurs de base inspirées de l'ancien theme.ts
-  static const Color background = Color(0xFF0A1628);
-  static const Color surface = Color(0xFF132A3E);
-  static const Color card = Color(0xFF1B3550);
-  static const Color border = Color(0xFF264A6B);
-  static const Color text = Color(0xFFF0F4F8);
-  static const Color textSecondary = Color(0xFF8BA3BA);
-  static const Color accent = Color(0xFFD4A74A);
-  static const Color success = Color(0xFF4CAF50);
-  static const Color warning = Color(0xFFFF9800);
-  static const Color error = Color(0xFFF44336);
+  // ── Base ──────────────────────────────────────────────
+  static const Color background = Color(0xFFFAF8F3); // crème paper
+  static const Color surface = Color(0xFFFFFFFF); // blanc
+  static const Color card = Color(0xFFFFFFFF); // cartes blanches avec ombre
+  static const Color cardAlt = Color(0xFFF4F1EA); // crème alternatif
+  static const Color border = Color(0xFFEAE5D8); // beige doux
 
-  static ThemeData get dark {
+  // ── Texte ─────────────────────────────────────────────
+  static const Color text = Color(0xFF3D3A32); // charbon chaud
+  static const Color textSecondary = Color(0xFF8A857A); // gris chaud
+  static const Color textOnAccent = Color(0xFFFFFFFF);
+
+  // ── Accents (sage green, identité agricole) ──────────
+  static const Color accent = Color(0xFF87A878); // sage
+  static const Color accentSoft = Color(0xFFDFECD4); // sage très pâle
+  static const Color accentDark = Color(0xFF5E8057); // sage foncé
+
+  // ── Secondary (terracotta doux) ──────────────────────
+  static const Color secondary = Color(0xFFD08A76);
+  static const Color secondarySoft = Color(0xFFF5DCD1);
+
+  // ── Status ───────────────────────────────────────────
+  static const Color success = Color(0xFF88C293); // mint doux
+  static const Color successSoft = Color(0xFFD9ECDB);
+  static const Color warning = Color(0xFFE8B25F); // ambre chaud
+  static const Color warningSoft = Color(0xFFFAE9C9);
+  static const Color error = Color(0xFFE48A82); // corail doux
+  static const Color errorSoft = Color(0xFFF5D6D1);
+
+  /// Ombre subtile pour les cartes, donne un effet pastel moderne.
+  static List<BoxShadow> get softShadow => [
+        BoxShadow(
+          // ignore: deprecated_member_use
+          color: Colors.black.withOpacity(0.04),
+          blurRadius: 12,
+          offset: const Offset(0, 2),
+        ),
+      ];
+
+  /// Ombre moyenne pour cartes mises en avant.
+  static List<BoxShadow> get mediumShadow => [
+        BoxShadow(
+          // ignore: deprecated_member_use
+          color: Colors.black.withOpacity(0.06),
+          blurRadius: 20,
+          offset: const Offset(0, 4),
+        ),
+      ];
+
+  static ThemeData get light {
     return ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       useMaterial3: true,
       scaffoldBackgroundColor: background,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         surface: surface,
         primary: accent,
-        secondary: accent,
+        onPrimary: Colors.white,
+        secondary: secondary,
+        onSecondary: Colors.white,
         error: error,
         onSurface: text,
-        onPrimary: Color(0xFF0A1628),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: surface,
+        backgroundColor: background,
         foregroundColor: text,
         elevation: 0,
         centerTitle: false,
@@ -44,14 +82,8 @@ class AppTheme {
         bodyLarge: TextStyle(color: text),
         bodyMedium: TextStyle(color: text),
         bodySmall: TextStyle(color: textSecondary),
-        titleLarge: TextStyle(
-          color: text,
-          fontWeight: FontWeight.w800,
-        ),
-        titleMedium: TextStyle(
-          color: text,
-          fontWeight: FontWeight.w700,
-        ),
+        titleLarge: TextStyle(color: text, fontWeight: FontWeight.w800),
+        titleMedium: TextStyle(color: text, fontWeight: FontWeight.w700),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: surface,
@@ -61,12 +93,18 @@ class AppTheme {
         showUnselectedLabels: true,
         selectedLabelStyle: TextStyle(
           fontSize: 10,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
         unselectedLabelStyle: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
         ),
+        elevation: 0,
+      ),
+      dividerTheme: const DividerThemeData(
+        color: border,
+        thickness: 1,
+        space: 1,
       ),
     );
   }

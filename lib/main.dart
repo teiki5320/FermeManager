@@ -19,9 +19,8 @@ class FermeManagerApp extends StatelessWidget {
       child: MaterialApp(
         title: 'FermeManager',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.dark,
+        theme: AppTheme.light,
+        themeMode: ThemeMode.light,
         home: const RootTabs(),
       ),
     );
