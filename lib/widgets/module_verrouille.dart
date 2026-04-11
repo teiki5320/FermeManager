@@ -1,0 +1,267 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../constants/theme.dart';
+import '../providers/modules_provider.dart';
+
+/// Équivalent Flutter du composant `ModuleVerrouille` React Native.
+/// Affiche un bandeau "Mode démo", le contenu démo semi-transparent,
+/// puis une zone d'action (commander via WhatsApp / saisir un code).
+class ModuleVerrouille extends StatefulWidget {
+  final String moduleName;
+  final String prix;
+  final Widget child;
+
+  const ModuleVerrouille({
+    super.key,
+    required this.moduleName,
+    required this.prix,
+    required this.child,
+  });
+
+  @override
+  State<ModuleVerrouille> createState() => _ModuleVerrouilleState();
+}
+
+class _ModuleVerrouilleState extends State<ModuleVerrouille> {
+  final TextEditingController _codeCtrl = TextEditingController();
+  bool _showUnlock = false;
+
+  @override
+  void dispose() {
+    _codeCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleWhatsApp() async {
+    final msg = Uri.encodeComponent(
+      'Bonjour, je veux débloquer le module ${widget.moduleName} '
+      'de FermeManager (${widget.prix}).',
+    );
+    // TODO: remplacer par le vrai numéro WhatsApp.
+    final uri = Uri.parse('https://wa.me/33XXXXXXXXX?text=$msg');
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (!mounted) return;
+      _showAlert('Erreur', "Impossible d'ouvrir WhatsApp.");
+    }
+  }
+
+  Future<void> _handleUnlock() async {
+    if (_codeCtrl.text.length != 8) {
+      _showAlert('Erreur', 'Le code doit contenir 8 chiffres.');
+      return;
+    }
+    final provider = context.read<ModulesProvider>();
+    final result = await provider.tryUnlock(_codeCtrl.text);
+    if (!mounted) return;
+    _showAlert(result.success ? 'Succès' : 'Erreur', result.message);
+    if (result.success) {
+      _codeCtrl.clear();
+      setState(() => _showUnlock = false);
+    }
+  }
+
+  void _showAlert(String title, String message) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        title: Text(title, style: const TextStyle(color: AppTheme.text)),
+        content: Text(message, style: const TextStyle(color: AppTheme.text)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text(
+              'OK',
+              style: TextStyle(color: AppTheme.accent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Bandeau doré "Mode démo"
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          color: AppTheme.accent,
+          child: Text(
+            'Mode démo — Débloquer pour ${widget.prix}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFF0A1628),
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+            ),
+          ),
+        ),
+        // Contenu démo semi-transparent, non-interactif
+        Expanded(
+          child: Opacity(
+            opacity: 0.7,
+            child: IgnorePointer(child: widget.child),
+          ),
+        ),
+        // Zone d'action
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: AppTheme.surface,
+            border: Border(top: BorderSide(color: AppTheme.border)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: _showUnlock ? _buildCodeInput() : _buildButtons(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildButtons() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _handleWhatsApp,
+            icon: const Icon(Icons.chat_bubble, color: Colors.white),
+            label: const Text('Commander via WhatsApp'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF25D366),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => setState(() => _showUnlock = true),
+            icon: const Icon(Icons.vpn_key_outlined, color: AppTheme.accent),
+            label: const Text(
+              "J'ai un code",
+              style: TextStyle(color: AppTheme.accent),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppTheme.accent),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCodeInput() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Entrez votre code de déblocage :',
+          style: TextStyle(
+            color: AppTheme.text,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _codeCtrl,
+                keyboardType: TextInputType.number,
+                maxLength: 8,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(8),
+                ],
+                style: const TextStyle(
+                  color: AppTheme.text,
+                  fontSize: 18,
+                  letterSpacing: 4,
+                ),
+                decoration: InputDecoration(
+                  counterText: '',
+                  hintText: 'Code à 8 chiffres',
+                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                  filled: true,
+                  fillColor: AppTheme.card,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppTheme.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppTheme.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppTheme.accent),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: _handleUnlock,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.accent,
+                foregroundColor: const Color(0xFF0A1628),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              child: const Text('Valider'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextButton(
+          onPressed: () => setState(() => _showUnlock = false),
+          child: const Text(
+            'Annuler',
+            style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+          ),
+        ),
+      ],
+    );
+  }
+}
